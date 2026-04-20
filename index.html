@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>4EVR Live</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230a0a0a'/%3E%3Ccircle cx='8' cy='8' r='3' fill='%23f7931a'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <!-- Password gate -->
+  <div id="gate" class="gate hidden" aria-hidden="true">
+    <form class="gate-card" id="gate-form" autocomplete="off">
+      <h1>4EVR Live</h1>
+      <p class="gate-sub">Admin secret required.</p>
+      <input
+        id="gate-input"
+        type="password"
+        placeholder="admin secret"
+        autocomplete="off"
+        spellcheck="false"
+        autocapitalize="off"
+        required
+      />
+      <button type="submit" id="gate-btn">Enter</button>
+      <div class="gate-error" id="gate-error"></div>
+    </form>
+  </div>
+
+  <!-- Dashboard shell -->
+  <div id="app" class="app hidden">
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="logo">4EVR</span>
+        <span class="logo-sub">live</span>
+      </div>
+      <div class="topbar-right">
+        <span class="status-dot" id="status-dot" title="status"></span>
+        <span class="meta" id="last-updated">—</span>
+        <span class="meta-sep">·</span>
+        <span class="meta" id="backend-state">idle</span>
+        <button id="logout-btn" class="ghost-btn" title="Clear session">logout</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div id="progress-fill" class="progress-fill"></div></div>
+    </header>
+
+    <main class="content">
+
+      <!-- Row 1: KPI cards -->
+      <section class="grid kpi-grid">
+        <article class="card kpi">
+          <div class="kpi-label">Live visitors <span class="pulse"></span></div>
+          <div class="kpi-value mono" id="kpi-live">—</div>
+          <div class="kpi-sub" id="kpi-live-sub">last 5 min</div>
+        </article>
+        <article class="card kpi">
+          <div class="kpi-label">Today (so far)</div>
+          <div class="kpi-value mono" id="kpi-today">—</div>
+          <div class="kpi-sub" id="kpi-today-sub">visitors · GA4</div>
+        </article>
+        <article class="card kpi">
+          <div class="kpi-label">Today's declarations</div>
+          <div class="kpi-value mono" id="kpi-decls">—</div>
+          <div class="kpi-sub" id="kpi-decls-sub">paid + confirmed</div>
+        </article>
+        <article class="card kpi">
+          <div class="kpi-label">Today's revenue</div>
+          <div class="kpi-value mono accent" id="kpi-rev">—</div>
+          <div class="kpi-sub" id="kpi-rev-sub">USD</div>
+        </article>
+      </section>
+
+      <!-- Row 2: Histogram -->
+      <section class="card">
+        <header class="card-header">
+          <h2>Traffic</h2>
+          <div class="tabs" role="tablist" id="range-tabs">
+            <button class="tab active" data-range="day" role="tab">Day</button>
+            <button class="tab" data-range="week" role="tab">Week</button>
+            <button class="tab" data-range="month" role="tab">Month</button>
+            <button class="tab" data-range="year" role="tab">Year</button>
+          </div>
+        </header>
+        <div class="chart-wrap">
+          <canvas id="histogram"></canvas>
+          <div class="empty-overlay hidden" id="histogram-empty">Backend not yet deployed</div>
+        </div>
+      </section>
+
+      <!-- Row 3: Top pages + traffic sources -->
+      <section class="grid two-col">
+        <article class="card">
+          <header class="card-header"><h2>Top pages</h2><span class="hint">GA4</span></header>
+          <div class="table-wrap">
+            <table id="pages-table">
+              <thead>
+                <tr><th>Path</th><th class="num">Views</th><th class="num">Uniques</th><th class="num">Avg eng. (s)</th></tr>
+              </thead>
+              <tbody><tr class="empty"><td colspan="4">—</td></tr></tbody>
+            </table>
+          </div>
+        </article>
+        <article class="card">
+          <header class="card-header"><h2>Traffic sources</h2><span class="hint">GA4 + attribution</span></header>
+          <div class="table-wrap">
+            <table id="sources-table">
+              <thead>
+                <tr><th>Source / medium</th><th class="num">Visitors</th><th class="num">Paid decls</th><th class="num">Revenue</th></tr>
+              </thead>
+              <tbody><tr class="empty"><td colspan="4">—</td></tr></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- Row 4: Funnel -->
+      <section class="card">
+        <header class="card-header"><h2>Funnel</h2><span class="hint">visited → confirmed</span></header>
+        <div class="funnel" id="funnel">
+          <div class="funnel-empty">—</div>
+        </div>
+      </section>
+
+      <!-- Row 5: Affiliate attribution -->
+      <section class="card">
+        <header class="card-header"><h2>Affiliate attribution</h2><span class="hint">15% commission</span></header>
+        <div class="table-wrap">
+          <table id="affiliates-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th class="num">Visitors</th>
+                <th class="num">Paid decls</th>
+                <th class="num">Revenue</th>
+                <th class="num">Commission (15%)</th>
+              </tr>
+            </thead>
+            <tbody><tr class="empty"><td colspan="5">—</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Row 6: Live event feed -->
+      <section class="card feed-card">
+        <header class="card-header"><h2>Live events</h2><span class="hint">last 20</span></header>
+        <ul class="feed" id="feed">
+          <li class="feed-empty">—</li>
+        </ul>
+      </section>
+
+      <footer class="footer">
+        <span>4EVR Live Dashboard</span>
+        <span id="footer-endpoint"></span>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Toasts -->
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+.DS_Store
+.idea/
+.vscode/
+node_modules/
+*.log
+.env
+.env.*
+
+# Agent/session local files — not part of the dashboard
+.claude/
+.mcp.json
+CLAUDE.md
