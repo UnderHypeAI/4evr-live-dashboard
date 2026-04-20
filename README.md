@@ -109,9 +109,19 @@ can actually fetch data in production.**
 - The only configurable is `config.js → API_BASE`. Change it if the backend
   moves.
 - **Pages must be enabled once** for the workflow to succeed:
-  Settings → Pages → Source: **GitHub Actions**. If an agent couldn't enable
-  it via API, Aaron needs to flip this toggle once manually; subsequent pushes
-  auto-deploy.
+  Settings → Pages → Source: **GitHub Actions**. The setup agent attempted to
+  enable this via `PATCH /repos/.../pages` but got HTTP 422:
+  _"Your current plan does not support GitHub Pages for this repository."_
+  That error is GitHub's way of saying: **Pages on a private repo requires
+  GitHub Pro (or Team/Enterprise)**. Two options for Aaron:
+  1. Upgrade the `UnderHypeAI` account to Pro ($4/mo) → then flip
+     Settings → Pages → Source: **GitHub Actions**. The existing workflow
+     will deploy on the next push (or run `gh workflow run pages.yml`).
+  2. Make the repo public (nothing sensitive is committed — the admin secret
+     is runtime-only in sessionStorage) → then enable Pages as above at no
+     cost.
+  Once Pages is on, the URL is **https://underhypeai.github.io/4evr-live-dashboard/**
+  and subsequent pushes redeploy automatically.
 
 ## Files
 
